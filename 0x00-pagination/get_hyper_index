@@ -1,0 +1,24 @@
+def get_hyper_index(self, index: int = None, page_size: int = 10) -> Dict:
+    """Return a page of the dataset starting from the given index with deletion resilience"""
+    assert isinstance(index, int) and index >= 0
+    indexed_data = self.indexed_dataset()
+    assert index < max(indexed_data.keys())  # Raises AssertionError if out of bounds
+
+    data = []
+    current_index = index
+    collected = 0
+
+    # Skip deleted indices, collect valid items
+    while collected < page_size and current_index < len(self.dataset()):
+        if current_index in indexed_data:
+            data.append(indexed_data[current_index])
+            collected += 1
+        current_index += 1
+
+    # Return values in correct order
+    return {
+        'index': index,
+        'data': data,
+        'page_size': page_size,
+        'next_index': current_index
+    }
